@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>低頻音波產生程式</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to right, #6a11cb, #2575fc); /* 漸層背景 */
+            color: white; /* 文字顏色 */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(255, 255, 255, 0.1); /* 表格背景透明 */
+            border-radius: 8px; /* 圓角 */
+        }
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.3); /* 表格邊框顏色 */
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: rgba(255, 255, 255, 0.2); /* 表頭背景透明 */
+            color: #00FF00; /* 更亮的綠色 */
+        }
+        .description {
+            margin: 20px 0;
+            font-size: 1.1em;
+            background-color: rgba(255, 255, 255, 0.2); /* 描述背景透明 */
+            padding: 10px;
+            border-radius: 5px; /* 圓角 */
+        }
+        .slider-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .frequency-display {
+            font-size: 1.5em;
+            text-align: center;
+            margin: 10px 0;
+            color: #FFD700; /* 金色 */
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 0 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50; /* 按鈕顏色 */
+            color: white;
+            width: 100%; /* 使按鈕在小螢幕上全寬 */
+        }
+        button:hover {
+            background-color: #45a049; /* 按鈕懸停顏色 */
+        }
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #FFD700; /* 金色 */
+            transition: width 0.1s linear;
+        }
+        .timer-display {
+            font-size: 1.5em;
+            text-align: center;
+            margin: 10px 0;
+            color: #FFD700; /* 金色 */
+        }
+        .canvas-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        canvas {
+            width: 100%;
+            height: 200px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        /* 媒體查詢以適配小螢幕 */
+        @media (max-width: 600px) {
+            button {
+                font-size: 0.9em; /* 調整按鈕字體大小 */
+            }
+            .description {
+                font-size: 1em; /* 調整描述字體大小 */
+            }
+            .frequency-display {
+                font-size: 1.2em; /* 調整頻率顯示字體大小 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>低頻音波產生程式</h1>
+
+<div class="description">
+    🔸 主要影響：影響細胞膜電位與離子通道，增強血液循環與細胞修復能力
+</div>
+
+<table>
+    <tr>
+        <th>頻率範圍</th>
+        <th>影響</th>
+        <th>可能應用</th>
+    </tr>
+    <tr>
+        <td>0.5 - 3 Hz</td>
+        <td>影響腦波、減少焦慮</td>
+        <td>冥想、深層放鬆</td>
+    </tr>
+    <tr>
+        <td>4 - 7 Hz（Theta 波）</td>
+        <td>刺激神經系統、修復細胞</td>
+        <td>睡眠治療、細胞修復</td>
+    </tr>
+    <tr>
+        <td>8 - 14 Hz（Alpha 波）</td>
+        <td>增強細胞能量代謝</td>
+        <td>提高專注力、減少壓力</td>
+    </tr>
+    <tr>
+        <td>15 - 20 Hz</td>
+        <td>促進血液循環、加速細胞修復</td>
+        <td>疼痛管理、神經康復</td>
+    </tr>
+</table>
+
+<div class="description">
+    ✅ 細胞機制：<br>
+    • 低頻音波可以影響細胞膜的電荷分布，進而影響電位差<br>
+    • 對離子通道（鈣、鈉、鉀）產生作用，影響細胞內外電流傳導
+</div>
+
+<div class="description">
+    ✅ 應用場景：<br>
+    • 透過低頻共振音波，可用於細胞修復、疼痛管理與神經康復<br>
+</div>
+
+<div class="description">
+    ✅ 添加預設模式：<br>
+    • 提供一些預設模式（如「放鬆模式（Theta 波）」、「專注模式（Alpha 波）」等），用戶可以快速選擇這些模式來設定推薦頻率。
+</div>
+
+<!-- 頻率調整 -->
+<div class="slider-container">
+    <label for="frequencySlider">調整頻率 (0.1 Hz - 20 Hz): </label>
+    <input type="range" id="frequencySlider" min="0.1" max="20" step="0.1" value="0.1">
+</div>
+
+<div class="frequency-display" id="frequencyDisplay">設定頻率: 0.1 Hz</div>
+
+<!-- 波形選擇 -->
+<div class="slider-container">
+    <label for="waveformSelect">選擇波形: </label>
+    <select id="waveformSelect">
+        <option value="sine">正弦波</option>
+        <option value="square">方波</option>
+        <option value="triangle">三角波</option>
+        <option value="sawtooth">鋸齒波</option>
+    </select>
+</div>
+
+<!-- 播放時間輸入 -->
+<div class="slider-container">
+    <label for="durationInput">播放時間 (秒): </label>
+    <input type="number" id="durationInput" value="5" min="1">
+</div>
+
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="timer-display" id="timerDisplay">計時: 0秒</div>
+
+<div class="description">
+    ✅ 音量控制：<br>
+    <label for="volumeSlider">調整音量: </label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+</div>
+
+<div class="description">
+    ✅ 立體聲模式：<br>
+    <label for="leftFrequencySlider">左耳頻率: </label>
+    <input type="range" id="leftFrequencySlider" min="0.1" max="20" step="0.1" value="0.1">
+    <label for="rightFrequencySlider">右耳頻率: </label>
+    <input type="range" id="rightFrequencySlider" min="0.1" max="20" step="0.1" value="0.1">
+</div>
+
+<div class="button-container">
+    <button id="playButton">播放</button>
+    <button id="stopButton">停止</button>
+</div>
+
+<!-- 震盪圖顯示 -->
+<div class="canvas-container">
+    <canvas id="oscilloscope"></canvas>
+</div>
+
+<script>
+    let frequency = 0.1;  // 初始頻率
+    let duration = 5;  // 播放持續時間（秒）
+    let isPlaying = false; // 播放狀態
+    let progressInterval; // 進度條計時器
+    let timerInterval; // 計時器計時器
+    let elapsedTime = 0; // 計時器時間
+    let audioContext;
+    let leftOscillator, rightOscillator;
+    let gainNode, analyserNode;
+
+    function createAudioContext() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = 1; // 初始音量
+        gainNode.connect(audioContext.destination);
+
+        analyserNode = audioContext.createAnalyser();
+        gainNode.connect(analyserNode);
+        analyserNode.connect(audioContext.destination);
+    }
+
+    function playWave(frequencyLeft, frequencyRight) {
+        if (!audioContext) {
+            createAudioContext();
+        }
+
+        if (leftOscillator) {
+            leftOscillator.stop();
+            leftOscillator.disconnect();
+        }
+        if (rightOscillator) {
+            rightOscillator.stop();
+            rightOscillator.disconnect();
+        }
+
+        leftOscillator = audioContext.createOscillator();
+        leftOscillator.type = document.getElementById('waveformSelect').value;
+        leftOscillator.frequency.setValueAtTime(frequencyLeft, audioContext.currentTime);
+        leftOscillator.connect(gainNode);
+        leftOscillator.start();
+
+        rightOscillator = audioContext.createOscillator();
+        rightOscillator.type = document.getElementById('waveformSelect').value;
+        rightOscillator.frequency.setValueAtTime(frequencyRight, audioContext.currentTime);
+        rightOscillator.connect(gainNode);
+        rightOscillator.start();
+
+        drawOscilloscope(); // 開始繪製震盪圖
+    }
+
+    function stopWave() {
+        if (leftOscillator) {
+            leftOscillator.stop();
+            leftOscillator.disconnect();
+            leftOscillator = null;
+        }
+        if (rightOscillator) {
+            rightOscillator.stop();
+            rightOscillator.disconnect();
+            rightOscillator = null;
+        }
+        isPlaying = false;
+    }
+
+    function startProgressBar() {
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = '0%'; // 重置進度條
+        let startTime = Date.now();
+
+        progressInterval = setInterval(() => {
+            let elapsed = (Date.now() - startTime) / 1000;
+            let progress = (elapsed / duration) * 100;
+
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                stopWave();  // 自動停止音波
+            } else {
+                progressBar.style.width = progress + '%';
+            }
+        }, 100);
+    }
+
+    function stopProgressBar() {
+        clearInterval(progressInterval);
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = '0%'; // 重置進度條
+    }
+
+    function startTimer() {
+        elapsedTime = 0; // 重置計時器
+        document.getElementById('timerDisplay').innerText = `計時: ${elapsedTime}秒`;
+
+        timerInterval = setInterval(() => {
+            elapsedTime++;
+            document.getElementById('timerDisplay').innerText = `計時: ${elapsedTime}秒`;
+        }, 1000); // 每秒更新
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        document.getElementById('timerDisplay').innerText = `計時: 0秒`; // 重置計時器顯示
+    }
+
+    function drawOscilloscope() {
+        const canvas = document.getElementById('oscilloscope');
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyserNode.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+            requestAnimationFrame(draw);
+            analyserNode.getByteTimeDomainData(dataArray);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#FFD700';
+            ctx.beginPath();
+
+            const sliceWidth = canvas.width / bufferLength;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0; // 將數據標準化到 0-1
+                const y = v * canvas.height / 2; // 將數據轉換為畫布的高度
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                x += sliceWidth;
+            }
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+
+        draw();
+    }
+
+    // 監聽滑動按鈕的變化
+    document.getElementById('frequencySlider').addEventListener('input', function() {
+        frequency = parseFloat(this.value);
+        document.getElementById('frequencyDisplay').innerText = `設定頻率: ${frequency.toFixed(1)} Hz`; // 更新顯示，保留一位小數
+
+        // 即時更新頻率
+        if (isPlaying) {
+            leftOscillator.frequency.linearRampToValueAtTime(frequency, audioContext.currentTime + 0.1);
+            rightOscillator.frequency.linearRampToValueAtTime(frequency, audioContext.currentTime + 0.1);
+        }
+    });
+
+    // 播放按鈕事件
+    document.getElementById('playButton').addEventListener('click', function() {
+        duration = parseInt(document.getElementById('durationInput').value); // 更新播放時間
+        stopWave();  // 先停止當前音波，確保能順利重新播放
+        const leftFrequency = parseFloat(document.getElementById('leftFrequencySlider').value);
+        const rightFrequency = parseFloat(document.getElementById('rightFrequencySlider').value);
+        playWave(leftFrequency, rightFrequency); // 播放新的頻率
+        startProgressBar(); // 開始進度條
+        startTimer(); // 開始計時器
+        isPlaying = true; // 設置播放狀態
+    });
+
+    // 停止按鈕事件
+    document.getElementById('stopButton').addEventListener('click', function() {
+        stopWave(); // 停止播放
+        stopProgressBar(); // 停止進度條
+        stopTimer(); // 停止計時器
+    });
+
+    // 初始顯示
+    document.getElementById('frequencyDisplay').innerText = `設定頻率: ${frequency.toFixed(1)} Hz`;
+
+    document.getElementById('volumeSlider').addEventListener('input', function() {
+        gainNode.gain.value = parseFloat(this.value);
+    });
+
+    // 確保 canvas 在窗口調整大小時更新
+    window.addEventListener('resize', function() {
+        const canvas = document.getElementById('oscilloscope');
+        canvas.width = window.innerWidth * 0.9; // 設置 canvas 寬度
+        canvas.height = 200; // 設置 canvas 高度
+    });
+</script>
+
+</body>
+</html>
